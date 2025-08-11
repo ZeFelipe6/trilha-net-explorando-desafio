@@ -3,23 +3,120 @@ using DesafioProjetoHospedagem.Models;
 
 Console.OutputEncoding = Encoding.UTF8;
 
-// Cria os modelos de hóspedes e cadastra na lista de hóspedes
-List<Pessoa> hospedes = new List<Pessoa>();
+Reserva reserva = null;
 
-Pessoa p1 = new Pessoa(nome: "Hóspede 1");
-Pessoa p2 = new Pessoa(nome: "Hóspede 2");
+bool continuar = true;
 
-hospedes.Add(p1);
-hospedes.Add(p2);
+while (continuar)
+{
+    Console.Clear();
+    Console.WriteLine("-------Menu das Resevas-------");
+    Console.WriteLine("1 - Cadastrar suíte");
+    Console.WriteLine("2 - Cadastrar hóspedes");
+    Console.WriteLine("3 - Ver quantidade de hóspedes");
+    Console.WriteLine("4 - Calcular valor da diária");
+    Console.WriteLine("0 - Sair");
+    Console.WriteLine("------------------------------");
+    Console.Write("Escolha uma opção: ");
 
-// Cria a suíte
-Suite suite = new Suite(tipoSuite: "Premium", capacidade: 2, valorDiaria: 30);
+    string opcao = Console.ReadLine();
 
-// Cria uma nova reserva, passando a suíte e os hóspedes
-Reserva reserva = new Reserva(diasReservados: 5);
-reserva.CadastrarSuite(suite);
-reserva.CadastrarHospedes(hospedes);
+    switch (opcao)
+    {
+        case "1":
+            Console.Write("Informe o tipo da suíte: ");
+            string tipo = Console.ReadLine();
 
-// Exibe a quantidade de hóspedes e o valor da diária
-Console.WriteLine($"Hóspedes: {reserva.ObterQuantidadeHospedes()}");
-Console.WriteLine($"Valor diária: {reserva.CalcularValorDiaria()}");
+            Console.Write("Informe a capacidade da suíte: ");
+            int capacidade = int.Parse(Console.ReadLine());
+
+            Console.Write("Informe o valor da diária: ");
+            decimal valorDiaria = decimal.Parse(Console.ReadLine());
+
+            Suite suite = new Suite(tipo, capacidade, valorDiaria);
+
+            reserva = new Reserva();
+            reserva.CadastrarSuite(suite);
+
+            Console.WriteLine("Suíte cadastrada com sucesso!");
+            Console.ReadKey();
+            break;11
+
+        case "2":
+            if (reserva == null || reserva.Suite == null)
+            {
+                Console.WriteLine("Cadastre uma suíte antes de adicionar hóspedes.");
+                Console.ReadKey();
+                break;
+            }
+
+            Console.Write("Quantos hóspedes deseja cadastrar? ");
+            int qtd = int.Parse(Console.ReadLine());
+
+            List<Pessoa> hospedes = new List<Pessoa>();
+
+            for (int i = 0; i < qtd; i++)
+            {
+                Console.Write($"Digite o nome do hóspede {i + 1}: ");
+                string nome = Console.ReadLine();
+
+                Console.Write($"Digite o sobrenome do hóspede {i + 1}: ");
+                string sobrenome = Console.ReadLine();
+
+                hospedes.Add(new Pessoa(nome, sobrenome));
+            }
+
+            try
+            {
+                reserva.CadastrarHospedes(hospedes);
+                Console.WriteLine("Hóspedes cadastrados com sucesso!");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Erro: {ex.Message}");
+            }
+            Console.ReadKey();
+            break;
+
+        case "3":
+            if (reserva != null)
+                Console.WriteLine($"Quantidade de hóspedes: {reserva.ObterQuantidadeHospedes()}");
+            else
+                Console.WriteLine("Nenhuma reserva cadastrada.");
+            Console.ReadKey();
+            break;
+
+        case "4":
+            if (reserva != null)
+            {
+                Console.Write("Informe o número de dias reservados: ");
+                reserva.DiasReservados = int.Parse(Console.ReadLine());
+
+                try
+                {
+                    decimal valor = reserva.CalcularValorDiaria();
+                    Console.WriteLine($"Valor total da diária: R$ {valor}");
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"Erro: {ex.Message}");
+                }
+            }
+            else
+            {
+                Console.WriteLine("Nenhuma reserva cadastrada.");
+            }
+            Console.ReadKey();
+            break;
+
+        case "0":
+            continuar = false;
+            break;
+
+        default:
+            Console.WriteLine("Opção inválida!");
+            Console.ReadKey();
+            break;
+    }
+}
+
